@@ -16,14 +16,22 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 // interceptors 为拦截器，拦截器的作用是帮你拦截每一次请求，你可以在回调函数中做一些“手脚”，再将数据 return 回去。
 axios.interceptors.response.use(res => {
+  console.log('axios.interceptors.response: ', res);
   if (typeof res.data !== 'object') {
-    Toast.show('服务器异常！');
+    Toast.show({
+      content: '服务器异常',
+      duration: 2000,
+    });
     return Promise.reject(res);
   }
 
   if (res.data.code !== 200) {
+    console.log('code !== 200', res.data);
     if (res.data.msg) {
-      Toast.show(res.data.msg);
+      Toast.show({
+        content: res.data.msg,
+        duration: 2000,
+      });
     }
 
     if (res.data.code === 401) {

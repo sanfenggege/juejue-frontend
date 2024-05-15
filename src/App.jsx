@@ -1,29 +1,33 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "./index.css";
-import './App.css'
-import Index from './container/Index/index';
-import About from './container/About/about';
-
+import { useEffect, useState } from 'react';
+import {
+  Routes,
+  Route,
+  useLocation
+} from 'react-router-dom';
 import { ConfigProvider } from 'zarm';
-import zhCN from 'zarm/lib/config-provider/locale/zh_CN';
-// import 'zarm/dist/zarm.css';
+import 'zarm/dist/zarm.css';
 
-function App() {
-  const routes = createBrowserRouter([
-    {
-      path: "/",
-      element: <Index />,
-    },
-    {
-      path: "/about",
-      element: <About />,
-    },
-  ]);
+import routes from './router/index';
+import NavBar from './components/NavBar/index';
 
-  // return <RouterProvider router={routes} />;
-  return <ConfigProvider locale={zhCN}>
-    <RouterProvider router={routes} />
-  </ConfigProvider>
-}
+const App = () => {
+  const location = useLocation();
+  const needNav = ['/', '/data', '/user'];
+  const [showNav, setShowNav] = useState(false);
 
-export default App
+  useEffect(() => {
+    setShowNav(needNav.includes(location.pathname));
+  }, [location]);
+
+  return <ConfigProvider primaryColor='#007fff'>
+    <>
+      <Routes>
+        {routes.map(route => <Route exact key={route.path} path={route.path} element={<route.component />} />)}
+      </Routes>
+      {showNav && <NavBar />}
+    </>
+  </ConfigProvider>;
+};
+
+export default App;
+
