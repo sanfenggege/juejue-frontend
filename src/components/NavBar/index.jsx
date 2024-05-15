@@ -1,36 +1,37 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types'
 import { TabBar } from 'zarm';
 import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import style from './style.module.less';
-import CustomIcon from "../CustomIcon";
+import CustomIcon from '../CustomIcon';
+import s from './style.module.less';
 
-const NavBar = () => {
+const NavBar = ({ showNav }) => {
   const [activeKey, setActiveKey] = useState('/');
-  const navigateTo = useNavigate();
-  const changeTab = (path) => {
-    setActiveKey(path);
-    navigateTo(path);
-  };
+  const navigateTo = useNavigate()
+
+  const chnageTab = (path) => {
+    setActiveKey(path)
+    navigateTo(path)
+  }
 
   return (
-    <TabBar className={style.tab} activeKey={activeKey} onChange={changeTab}>
-      <TabBar.Item
-        itemKey="/"
-        title="账单"
-        icon={<CustomIcon type="zhangdan" />}
-      />
-      <TabBar.Item
-        itemKey="/data"
-        title="统计"
-        icon={<CustomIcon type="tongji" />}
-      />
-      <TabBar.Item
-        itemKey="/user"
-        title="我的"
-        icon={<CustomIcon type="wode" />}
-      />
-    </TabBar>
+    <TabBar visible={showNav} className={s.tab} activeKey={activeKey} onChange={chnageTab}>
+        <TabBar.Item
+          itemKey="/"
+          title="账单"
+          icon={<CustomIcon type="zhangdan" />}
+        />
+        <TabBar.Item
+          itemKey="/data"
+          title="统计"
+          icon={<CustomIcon type="tongji" />}
+        />
+        <TabBar.Item
+          itemKey="/user"
+          title="我的"
+          icon={<CustomIcon type="wode" />}
+        />
+      </TabBar>
   );
 };
 

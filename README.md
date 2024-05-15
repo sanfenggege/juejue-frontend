@@ -1,8 +1,19 @@
-# React + Vite
+Joey's React+Vite+NodeJS+H5 Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+#[学习课程]（https://juejin.cn/book/6966551262766563328?enter_from=search_result&utm_source=search）
 
-Currently, two official plugins are available:
+1.github code:
+[server](https://github.com/sanfenggege/joey-node-react-demo)
+[frontend](https://github.com/sanfenggege/joey-node-react-demo)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. 本地运行前先运行server、开启sql服务、开启DBeaver;
+
+1. 安装:
+```
+npm i
+```
+
+1. 本地运行：
+```
+npm run dev
+```

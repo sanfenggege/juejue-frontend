@@ -1,22 +1,34 @@
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Cell, Input, Button, Checkbox, Toast } from 'zarm';
-import CustomIcon from '../../components/CustomIcon';
-import style from './style.module.less';
-import { useState } from 'react';
-import { post } from '../../utils/index';
+import cx from 'classnames';
+import Captcha from "react-captcha-code";
+import CustomIcon from '@/components/CustomIcon';
+import { post } from '@/utils'
+
+import s from './style.module.less';
 
 const Login = () => {
-  const [type, setType] = useState('login');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [agreement, setAgreement] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const captchaRef = useRef();
+  const [type, setType] = useState('login'); // 登录注册类型
+  const [captcha, setCaptcha] = useState(''); // 验证码变化后存储值
+  const [username, setUsername] = useState(''); // 账号
+  const [password, setPassword] = useState(''); // 密码
+  const [verify, setVerify] = useState(''); // 验证码
 
-  const clickAgreement = (e) => {
-    console.log('click checkbox: ', e.target.checked);
-    setAgreement(e.target.checked);
-  }
-
+  //  验证码变化，回调方法
+  const handleChange = useCallback((captcha) => {
+    setCaptcha(captcha)
+  }, []);
+  
   const onSubmit = async () => {
+    if (!username) {
+      Toast.show('请输入账号')
+      return
+    }
+    if (!password) {
+      Toast.show('请输入密码')
+      return
+    }
     try {
       if (type == 'login') {
         const { data } = await post('/user/login', {
@@ -26,56 +38,74 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         window.location.href = '/';
       } else {
+        if (!verify) {
+          Toast.show('请输入验证码')
+          return
+        };
+        if (verify != captcha) {
+          Toast.show('验证码错误')
+          return
+        };
         const { data } = await post('/user/register', {
           username,
           password
         });
-        console.log('register success data: ', data);
         Toast.show('注册成功');
-        setType('login');
+         setType('login');
       }
     } catch (err) {
-      setErrorMsg(err.msg);
+      Toast.show(err.msg);
     }
   };
 
-  return (
-    <div className={style.auth}>
-      <div className={style.head}></div>
-      <div className={style.tab}>
-        <span className={type === 'login' ? `${style.active}` : ''} onClick={() => setType('login')}>登录</span>
-        <span className={type === 'register' ? `${style.active}` : ''} onClick={() => setType('register')}>注册</span>
-      </div>
-      <div className={style.form}>
-        <Cell icon={<CustomIcon type="zhanghao" />}>
-          <Input
-            clearable
-            type='text'
-            placeholder='请输入账号'
-            onChange={(value) => setUsername(value)}
-          />
-        </Cell>
-        {!username && <div className={style.notice}>请输入账号</div>}
-        <Cell icon={<CustomIcon type="mima" />}>
-          <Input
-            clearable
-            type='password'
-            placeholder='请输入密码'
-            onChange={(value) => setPassword(value)}
-          />
-        </Cell>
-        {!password && <div className={style.notice}>请输入密码</div>}
-      </div>
-      <div className={style.operation}>
-        {type === 'register' && <div className={style.agree}>
-          <Checkbox id="agreement" checked={agreement} onChange={clickAgreement} />
-          <label htmlFor="agreement">阅读并同意<a>《Joey Juejue 条款》</a></label>
-        </div>}
-        <Button onClick={onSubmit} block theme="primary" disabled={!username || !password || (type == 'register' && !agreement)}>{type == 'login' ? '登录' : '注册'}</Button>
-        {!errorMsg && <div className={style.notice}>{errorMsg}</div>}
-      </div>
+  useEffect(() => {
+    document.title = type == 'login' ? '登录' : '注册';
+  }, [type])
+  return <div className={s.auth}>
+    <div className={s.head} />
+    <div className={s.tab}>
+      <span className={cx({ [s.avtive]: type == 'login' })} onClick={() => setType('login')}>登录</span>
+      <span className={cx({ [s.avtive]: type == 'register' })} onClick={() => setType('register')}>注册</span>
     </div>
-  );
-}
+    <div className={s.form}>
+      <Cell icon={<CustomIcon type="zhanghao" />}>
+        <Input
+          clearable
+          type="text"
+          placeholder="请输入账号"
+          onChange={(value) => setUsername(value)}
+        />
+      </Cell>
+      <Cell icon={<CustomIcon type="mima" />}>
+        <Input
+          clearable
+          type="password"
+          placeholder="请输入密码"
+          onChange={(value) => setPassword(value)}
+        />
+      </Cell>
+      {
+        type == 'register' ? <Cell icon={<CustomIcon type="mima" />}>
+          <Input
+            clearable
+            type="text"
+            placeholder="请输入验证码"
+            onChange={(value) => setVerify(value)}
+          />
+          <Captcha ref={captchaRef} charNum={4} onChange={handleChange} />
+        </Cell> : null
+      }
+    </div>
+    <div className={s.operation}>
+      {
+        type == 'register' ? <div className={s.agree}>
+          <Checkbox />
+          <label className="text-light">阅读并同意<a>《手札Demo条款》</a></label>
+        </div> : null
+      }
+      <Button onClick={onSubmit} block theme="primary">{type == 'login' ? '登录' : '注册'}</Button>
+    </div>
+  </div>
+};
 
 export default Login;
